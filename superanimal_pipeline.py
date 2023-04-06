@@ -12,7 +12,6 @@ def segment_videos(video_file):
 
     output_dir = os.path.join(root_dir, "segmented_videos") # creates an output folder for our filtered videos
     segment_duration = 10 # in minutes
-    print(output_dir)
 
     # Create output directory if it does not exist
     if not os.path.exists(output_dir):
@@ -28,16 +27,17 @@ def segment_videos(video_file):
     num_segments = int(video_duration // (segment_duration * 60)) + 1
 
     # Execute the ffmpeg command to get the bitrate of the video
-    command = f"ffmpeg -i {video_file} 2>&1 | grep bitrate"
-    output = os.popen(command).read()
+    # see https://write.corbpie.com/getting-video-bitrate-with-ffprobe/
+    command = f"ffprobe -v quiet -select_streams v:0 -show_entries stream=bit_rate -of default=noprint_wrappers=1:nokey=1 {video_file}"
+    output = os.popen(command).read().split('\n')
 
-    # Extract the bitrate value from the output
-    bitrate_index = output.find("kb/s")
-    if bitrate_index != -1:
-        bitrate_str = output[bitrate_index-6:bitrate_index].strip()
-        video_bitrate = int(bitrate_str)
+    if output[0].isnumeric():
+        # divide by 1000 to get it in kbps
+        video_bitrate = int(output[0])/1000
     else:
-        return -1
+        print(f"Could not determine bitrate from ffprobe output: {output}. Exiting")
+        sys.exit()
+
 
     # Modify our bitrate by our bitrate factor
     video_bitrate/=bitrate_factor
@@ -52,7 +52,6 @@ def segment_videos(video_file):
         count_for_file = count_for_file.zfill(3)
         segment_filename = os.path.join(output_dir, f"{input_video_prefix}_{count_for_file}.avi")
         print(segment_filename)
-        sys.exit()
 
         # Use ffmpeg to segment video
         command = f'ffmpeg -i {video_file} -ss {start_time} -t {segment_duration * 60} -b:v {video_bitrate}k -vf format=gray {segment_filename}'
