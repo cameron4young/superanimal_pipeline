@@ -52,21 +52,23 @@ def segment_videos(folder_name):
         os.system(command)
 
 def pipeline(folder_name):
-    os.chdir(folder_name)
     cwd = os.getcwd()
-    # vvv if we want to run multiple folders at the same time vvv
-    # folders = [f.path for f in os.scandir(cwd) if f.is_dir()]
-    # video_folders = [f for f in folders if f[:3]=="MLA"]
-    # for folder_name in video_folders:
+    segmented_folder = os.path.join(cwd, folder_name, "segmented_videos")
 
-    segmented_videos = os.path.join(cwd, "segmented_videos")
+    segmented_list = os.listdir(segmented_folder)
 
-    segmented_videos = os.listdir(segmented_videos)
+    segmented_videos = []
 
-    # for video_path in segmented_videos:
+    for file in segmented_list:
+        file_path = os.path.join(segmented_folder, file)
+        if os.path.isfile(file_path):
+            segmented_videos.append(file_path)
+
+    print(segmented_videos)
+
     project_name = f'{folder_name}_DLCproject'
-    your_name = 'Cameron Young'
-    # video_path = deeplabcut.DownSampleVideo(video_path, width=300)
+    your_name = 'CY'
+
     config_path, train_config_path = deeplabcut.create_pretrained_project(
         project_name,
         your_name,
@@ -77,10 +79,6 @@ def pipeline(folder_name):
         createlabeledvideo=True,
         copy_videos=True, #must leave copy_videos=True
     )
+
 if __name__ == "__main__":
-    pipeline('MLA109')
-
-
-
-    
-
+    pipeline('MLA086')
