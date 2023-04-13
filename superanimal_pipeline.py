@@ -57,9 +57,10 @@ def segment_videos(video_file):
         command = f'ffmpeg -i {video_file} -ss {start_time} -t {segment_duration * 60} -b:v {video_bitrate}k -vf format=gray {segment_filename}'
         os.system(command)
 
+
+
 def pipeline(folder_name):
     segmented_folder = os.path.join(folder_name, "segmented_videos")
-
     segmented_list = os.listdir(segmented_folder)
 
     segmented_videos = []
@@ -68,7 +69,8 @@ def pipeline(folder_name):
         file_path = os.path.join(segmented_folder, file)
         # might need to actually check if this is a video
         if os.path.isfile(file_path):
-            segmented_videos.append(file_path)
+            segmented_videos.append(repr(file_path))
+
     # TODO: change this at some point
     project_name = f'{folder_name}_DLCproject'
     your_name = 'CY'
@@ -80,7 +82,7 @@ def pipeline(folder_name):
         videotype="avi",
         model="superanimal_topviewmouse",
         analyzevideo=True,
-        createlabeledvideo=True,
+        createlabeledvideo=False,
         copy_videos=True, #must leave copy_videos=True
     )
 
@@ -93,3 +95,4 @@ if __name__ == "__main__":
     segment_videos(video_file)
     folder_name = os.path.dirname(video_file)
     pipeline(folder_name)
+
