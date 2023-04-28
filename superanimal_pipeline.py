@@ -1,5 +1,4 @@
 import os
-import deeplabcut
 import sys
 
 def segment_videos(video_file):
@@ -7,9 +6,7 @@ def segment_videos(video_file):
     segment_duration = 600 # 10 minutes
 
     root_dir = os.path.dirname(video_file)
-    #input_video = [f for f in os.listdir(cwd) if f.endswith('.avi')][0] # gets the first video in the folder
-    
-
+        
     output_dir = os.path.join(root_dir, "segmented_videos_color") # creates an output folder for our filtered videos
     segment_duration = 10 # in minutes
 
@@ -56,38 +53,7 @@ def segment_videos(video_file):
         # Use ffmpeg to segment video
         command = f'ffmpeg -i {video_file} -ss {start_time} -t {segment_duration * 60} -b:v {video_bitrate}k {segment_filename}'
 
-        # command = f'ffmpeg -i {video_file} -ss {start_time} -t {segment_duration * 60} -b:v {video_bitrate}k -vf format=gray -s 160x120 {segment_filename}'
-        # command = f'ffmpeg -i {video_file} -ss {start_time} -t {segment_duration * 60} -vcodec libx264 -crf {bitrate_factor} -vf format=gray -s 160x120 {segment_filename}'
         os.system(command)
-
-
-
-def pipeline(folder_name):
-    segmented_folder = os.path.join(folder_name, "segmented_videos")
-    segmented_list = os.listdir(segmented_folder)
-
-    segmented_videos = []
-
-    for file in segmented_list:
-        file_path = os.path.join(segmented_folder, file)
-        # might need to actually check if this is a video
-        if os.path.isfile(file_path):
-            segmented_videos.append(repr(file_path))
-
-    # TODO: change this at some point
-    project_name = f'{folder_name}_DLCproject'
-    your_name = 'CY'
-
-    config_path, train_config_path = deeplabcut.create_pretrained_project(
-        project_name,
-        your_name,
-        segmented_videos,
-        videotype="avi",
-        model="superanimal_topviewmouse",
-        analyzevideo=False,
-        createlabeledvideo=False,
-        copy_videos=True, #must leave copy_videos=True
-    )
 
 if __name__ == "__main__":
     import argparse
@@ -96,9 +62,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     video_file = args.path
     segment_videos(video_file)
-    folder_name = os.path.dirname(video_file)
-    # pipeline(folder_name)
-
-# C:\Users\dlc\MLA086\2022-11-24\behavior_video2022-11-24T08_07_02.avi
-
-# C:\Users\dlc\MLA109\behavior_video2023-02-22T12_07_56.avi
