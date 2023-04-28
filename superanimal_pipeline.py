@@ -10,7 +10,7 @@ def segment_videos(video_file):
     #input_video = [f for f in os.listdir(cwd) if f.endswith('.avi')][0] # gets the first video in the folder
     
 
-    output_dir = os.path.join(root_dir, "segmented_videos") # creates an output folder for our filtered videos
+    output_dir = os.path.join(root_dir, "segmented_videos_color") # creates an output folder for our filtered videos
     segment_duration = 10 # in minutes
 
     # Create output directory if it does not exist
@@ -38,8 +38,8 @@ def segment_videos(video_file):
         print(f"Could not determine bitrate from ffprobe output: {output}. Exiting")
         sys.exit()
 
-
     # Modify our bitrate by our bitrate factor
+    print(video_bitrate, "bitrate")
     video_bitrate/=bitrate_factor
 
     #input_video_prefix = video_file[:-4]
@@ -54,7 +54,10 @@ def segment_videos(video_file):
         print(segment_filename)
 
         # Use ffmpeg to segment video
-        command = f'ffmpeg -i {video_file} -ss {start_time} -t {segment_duration * 60} -b:v {video_bitrate}k -vf format=gray {segment_filename}'
+        command = f'ffmpeg -i {video_file} -ss {start_time} -t {segment_duration * 60} -b:v {video_bitrate}k {segment_filename}'
+
+        # command = f'ffmpeg -i {video_file} -ss {start_time} -t {segment_duration * 60} -b:v {video_bitrate}k -vf format=gray -s 160x120 {segment_filename}'
+        # command = f'ffmpeg -i {video_file} -ss {start_time} -t {segment_duration * 60} -vcodec libx264 -crf {bitrate_factor} -vf format=gray -s 160x120 {segment_filename}'
         os.system(command)
 
 
@@ -81,7 +84,7 @@ def pipeline(folder_name):
         segmented_videos,
         videotype="avi",
         model="superanimal_topviewmouse",
-        analyzevideo=True,
+        analyzevideo=False,
         createlabeledvideo=False,
         copy_videos=True, #must leave copy_videos=True
     )
@@ -94,5 +97,8 @@ if __name__ == "__main__":
     video_file = args.path
     segment_videos(video_file)
     folder_name = os.path.dirname(video_file)
-    pipeline(folder_name)
+    # pipeline(folder_name)
 
+# C:\Users\dlc\MLA086\2022-11-24\behavior_video2022-11-24T08_07_02.avi
+
+# C:\Users\dlc\MLA109\behavior_video2023-02-22T12_07_56.avi
